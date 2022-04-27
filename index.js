@@ -2,13 +2,18 @@ const http = require('http')
 const got = require('got')
 
 const express = require('express')
-
+const config = require('./config.json')
 const app = express()
-let logsChannels = {"apulxd": [], "IVR": [], "harambelogs": []}
+let logsChannels = {}
+
+Object.keys(config.justLogs).forEach(justLog => {
+    logsChannels[justLog] = config.justLogs[justLog]
+})
+
 updateLogsChannels()
 
 app.get('*', (req, res) => {
-    const regex = new RegExp("(?:\\?|&|\\/)channel(?:=|\\/)([a-zA-Z_0-9]+)")
+    const regex = new RegExp("[?&/]channel[=/]([a-zA-Z_0-9]+)")
     const path = req.originalUrl
     const channel = regex.exec(path)?.[1] ?? null
     if (!channel) {
@@ -22,8 +27,8 @@ app.get('*', (req, res) => {
 
 const server = http.createServer(app)
 
-server.listen(5000, () => {
-    console.log('listening on port 5000')
+server.listen(config.port, () => {
+    console.log(`listening on port ${config.port.toString()}`)
 })
 
 setInterval(async () => {
@@ -31,39 +36,16 @@ setInterval(async () => {
 }, 600000)
 
 async function updateLogsChannels() {
-
-    try {
-        const {channels: channelsApulxd} = await got('https://logs.paauulli.me/channels').json();
-        logsChannels.apulxd = channelsApulxd.map(i => i.name)
-    } catch (e) {
-        console.log(`apulxd: ${e}`)
-    }
-
-    try {
-        const {channels: channelsIVR} = await got('https://logs.ivr.fi/channels').json();
-        logsChannels.IVR = channelsIVR.map(i => i.name)
-    } catch (e) {
-        console.log(`IVR: ${e}`)
-    }
-
-    try {
-        const {channels: channelsHarablelogs} = await got('https://logs.zneix.eu/channels').json();
-        logsChannels.harambelogs = channelsHarablelogs.map(i => i.name)
-    } catch (e) {
-        console.log(`Harambelogs: ${e}`)
+    for (const channel in config.justLogs) {
+        try {
+            const {channels} = await got(`${config.justLogs[channel]}/channels`).json();
+            logsChannels[channel] = channels.map(i => i.name)
+        } catch (e) {
+            console.warn(`${channel}: ${e}`)
+        }
     }
 }
 
 function getRightLogs(channel) {
-    let mainurl
-    if (logsChannels['apulxd'].includes(channel)) {
-        mainurl = "https://logs.paauulli.me"
-    } else if (logsChannels['IVR'].includes(channel)) {
-        mainurl = "https://logs.ivr.fi"
-    } else if (logsChannels['harambelogs'].includes(channel)) {
-        mainurl = "https://logs.zneix.eu"
-    } else {
-        mainurl = undefined
-    }
-    return mainurl
+    return config.justLogs[Object.keys(config.justLogs).find(justLog => logsChannels[justLog].includes(channel))]
 }
