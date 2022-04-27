@@ -1,51 +1,48 @@
 const http = require('http')
 const got = require('got')
-
 const express = require('express')
+
 const config = require('./config.json')
+const loggedChannels = {}
+
 const app = express()
-let logsChannels = {}
+app.get('*', (request, response) => {
+    const channelRegex = /[?&/]channel[=/]([a-zA-Z_0-9]+)/
 
-Object.keys(config.justLogs).forEach(justLog => {
-    logsChannels[justLog] = config.justLogs[justLog]
-})
+    const channel = channelRegex.exec(request.originalUrl)?.[1]
+    const justlogDomain = getJustlogsDomain(channel)
 
-updateLogsChannels()
-
-app.get('*', (req, res) => {
-    const regex = new RegExp("[?&/]channel[=/]([a-zA-Z_0-9]+)")
-    const path = req.originalUrl
-    const channel = regex.exec(path)?.[1] ?? null
-    if (!channel) {
-        res.send("Channel not found")
+    if (!justlogDomain) {
+        response.sendStatus(404)
         return
     }
-    const url = getRightLogs(channel)
-    res.redirect(`${url}${path}`)
-})
 
+    response.redirect(justlogDomain + request.originalUrl)
+})
 
 const server = http.createServer(app)
+server.listen(config.port, async () => {
+    console.log(`Server listening on port ${config.port}`)
 
-server.listen(config.port, () => {
-    console.log(`listening on port ${config.port.toString()}`)
+    await fetchLoggedChannels()
 })
 
-setInterval(async () => {
-    await updateLogsChannels()
-}, 600000)
-
-async function updateLogsChannels() {
-    for (const channel in config.justLogs) {
+async function fetchLoggedChannels() {
+    for (const justlogInstance in config.domains) {
         try {
-            const {channels} = await got(`${config.justLogs[channel]}/channels`).json();
-            logsChannels[channel] = channels.map(i => i.name)
+            const { channels } = await got(`${config.domains[justlogInstance]}/channels`).json();
+            loggedChannels[justlogInstance] = channels.map(i => i.name)
         } catch (e) {
-            console.warn(`${channel}: ${e}`)
+            console.warn(`${justlogInstance}: ${e}`)
         }
     }
 }
 
-function getRightLogs(channel) {
-    return config.justLogs[Object.keys(config.justLogs).find(justLog => logsChannels[justLog].includes(channel))]
+function getJustlogsDomain(channel) {
+    const justlogInstance = Object.keys(config.domains).find(justlogInstance => loggedChannels[justlogInstance].includes(channel))
+    return config.domains[justlogInstance]
 }
+
+setInterval(async () => {
+    await fetchLoggedChannels()
+}, 600000)
