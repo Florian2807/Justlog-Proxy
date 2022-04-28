@@ -10,7 +10,7 @@ Install [Node.js](https://nodejs.org/), if you dont have it already.
 
 **Clone** the repository:
 ```bash
-git clone https://github.com/Florian2807/FindLogsSite.git | cd FindLogsSite
+git clone https://github.com/Florian2807/JustlogRedirector.git | cd JustlogRedirector
 ```
 **Install** the dependencies:
 ```bash
