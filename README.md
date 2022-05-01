@@ -6,7 +6,7 @@ Live instance: https://logs.florian2807.me
 
 ## Installation
 
-Install [Node.js](https://nodejs.org/), if you dont have it already.
+Install [Node.js](https://nodejs.org/), if you don't have it already.
 
 **Clone** the repository:
 ```bash
