@@ -6,6 +6,14 @@ const config = require('./config.json')
 const loggedChannels = {}
 
 const app = express()
+app.get('/channels', (request, response) => {
+    if (!request.query.sorted) {
+        response.send(getAllChannels())
+    } else {
+        response.send(loggedChannels)
+    }
+})
+
 app.get('*', (request, response) => {
     const channelRegex = /[?&/]channel[=/]([a-zA-Z_0-9]+)/
 
@@ -30,7 +38,7 @@ server.listen(config.port, async () => {
 async function fetchLoggedChannels() {
     for (const justlogInstance in config.domains) {
         try {
-            const { channels } = await got(`${config.domains[justlogInstance]}/channels`).json();
+            const {channels} = await got(`${config.domains[justlogInstance]}/channels`).json();
             loggedChannels[justlogInstance] = channels.map(i => i.name)
         } catch (e) {
             console.warn(`${justlogInstance}: ${e}`)
@@ -41,6 +49,16 @@ async function fetchLoggedChannels() {
 function getJustlogsDomain(channel) {
     const justlogInstance = Object.keys(config.domains).find(justlogInstance => loggedChannels[justlogInstance].includes(channel))
     return config.domains[justlogInstance]
+}
+
+function getAllChannels() {
+    let allChannels = [];
+    Object.keys(loggedChannels).forEach(instances => {
+        loggedChannels[instances].forEach(channel => {
+            allChannels.push(channel);
+        })
+    })
+    return allChannels
 }
 
 setInterval(async () => {
