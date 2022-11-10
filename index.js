@@ -7,13 +7,13 @@ const loggedChannels = {}
 
 const app = express()
 
-app.get('/channels/instances/', (req, res) => {
-    response.send(loggedChannels)
-})
-
-app.get('/channels', (request, response) => {
-    response.send({channels: getAllChannels()})
-})
+// app.get('/channels/instances/', (req, res) => {
+//     response.send(loggedChannels)
+// })
+//
+// app.get('/channels', (request, response) => {
+//     response.send({channels: getAllChannels()})
+// })
 
 app.get('*', (request, response) => {
     const channelRegex = /[?&/]channel[=/]([a-zA-Z_0-9]+)/
@@ -50,7 +50,7 @@ async function fetchLoggedChannels() {
 }
 
 function getJustlogsDomain(channel) {
-    const justlogInstance = Object.keys(config.domains).find(justlogInstance => loggedChannels[justlogInstance].includes(channel))
+    const justlogInstance = Object.keys(config.domains).find(justlogInstance => loggedChannels[justlogInstance].map(c =>c.name).includes(channel))
     return config.domains[justlogInstance]
 }
 
