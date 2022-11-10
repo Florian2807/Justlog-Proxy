@@ -1,8 +1,0 @@
-{
-    "domains": {
-        "apulxd": "https://logs.paauulli.me",
-        "IVR": "https://logs.ivr.fi",
-        "harambelogs": "https://harambelogs.pl"
-    },
-    "port": 5001
-}
