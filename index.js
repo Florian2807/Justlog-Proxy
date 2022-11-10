@@ -7,13 +7,13 @@ const loggedChannels = {}
 
 const app = express()
 
-// app.get('/channels/instances/', (req, res) => {
-//     response.send(loggedChannels)
-// })
-//
-// app.get('/channels', (request, response) => {
-//     response.send({channels: getAllChannels()})
-// })
+app.get('/instances/', (req, res) => {
+    response.send(loggedChannels)
+})
+
+app.get('/channels', (request, response) => {
+    response.send({channels: getAllChannels()})
+})
 
 app.get('*', (request, response) => {
     const channelRegex = /[?&/]channel[=/]([a-zA-Z_0-9]+)/
