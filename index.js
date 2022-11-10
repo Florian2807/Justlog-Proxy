@@ -6,12 +6,13 @@ const config = require('./config.json')
 const loggedChannels = {}
 
 const app = express()
+
+app.get('/channels/instances/', (req, res) => {
+    response.send(loggedChannels)
+})
+
 app.get('/channels', (request, response) => {
-    if (!request.query.sorted) {
-        response.send(getAllChannels())
-    } else {
-        response.send(loggedChannels)
-    }
+    response.send({channels: getAllChannels()})
 })
 
 app.get('*', (request, response) => {
@@ -39,7 +40,9 @@ async function fetchLoggedChannels() {
     for (const justlogInstance in config.domains) {
         try {
             const {channels} = await got(`${config.domains[justlogInstance]}/channels`).json();
-            loggedChannels[justlogInstance] = channels.map(i => i.name)
+            loggedChannels[justlogInstance] = channels.map(i => {
+                return {userID: i.userID, name: i.name}
+            })
         } catch (e) {
             console.warn(`${justlogInstance}: ${e}`)
         }
