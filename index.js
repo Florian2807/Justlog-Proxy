@@ -30,8 +30,12 @@ app.get('*', (request, response) => {
 })
 
 const server = http.createServer(app)
+const date = new Intl.DateTimeFormat("de-de", {
+    dateStyle: "medium",
+    timeStyle: "medium",
+}).format(new Date());
 server.listen(config.port, async () => {
-    console.log(`Server listening on port ${config.port}`)
+    console.log(`${date}: Server listening on port ${config.port}`)
 
     await fetchLoggedChannels()
 })
@@ -39,12 +43,16 @@ server.listen(config.port, async () => {
 async function fetchLoggedChannels() {
     for (const justlogInstance in config.domains) {
         try {
-            const {channels} = await got(`${config.domains[justlogInstance]}/channels`).json();
+            const {channels} = await got(`${config.domains[justlogInstance]}/channels`, {retry: {limit: 2}}).json();
             loggedChannels[justlogInstance] = channels.map(i => {
                 return {userID: i.userID, name: i.name}
             })
-        } catch (e) {
-            console.warn(`${justlogInstance}: ${e}`)
+        } catch (e) {    
+            const date = new Intl.DateTimeFormat("de-de", {
+            dateStyle: "medium",
+            timeStyle: "medium",
+        }).format(new Date());
+            console.warn(`${date} ${justlogInstance}: ${e}`)
         }
     }
 }
