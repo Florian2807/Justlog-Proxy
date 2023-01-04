@@ -12,7 +12,7 @@ app.get('/instances/', (req, res) => {
 })
 
 app.get('/channels', (request, response) => {
-    response.send({channels: getAllChannels()})
+    response.send({channels: getAllChannels().sort((a, b) => a.name.localeCompare(b.name))})
 })
 
 app.get('*', (request, response) => {
