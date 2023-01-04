@@ -8,7 +8,7 @@ const loggedChannels = {}
 const app = express()
 
 app.get('/instances/', (req, res) => {
-    response.send(loggedChannels)
+    res.send(loggedChannels)
 })
 
 app.get('/channels', (request, response) => {
