@@ -44,7 +44,6 @@ async function fetchLoggedChannels() {
     for (const justlogInstance in config.domains) {
         try {
             const {channels} = await got(`${config.domains[justlogInstance]}/channels`, {retry: {limit: 2}}).json();
-            console.log(channels.length)
             loggedChannels[justlogInstance] = channels.map(i => {
                 if (!Object.values(loggedChannels).flat().map(c => {
                     return c?.name
