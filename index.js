@@ -43,22 +43,30 @@ server.listen(config.port, async () => {
 async function fetchLoggedChannels() {
     for (const justlogInstance in config.domains) {
         try {
-            const {channels} = await got(`${config.domains[justlogInstance]}/channels`, {retry: {limit: 2}}).json();
+            const {channels} = await got(`${config.domains[justlogInstance]}/channels`, {retry: {limit: 2}}).json();
+            console.log(channels.length)
             loggedChannels[justlogInstance] = channels.map(i => {
-                return {userID: i.userID, name: i.name}
+                if (!Object.values(loggedChannels).flat().map(c => {
+                    return c?.name
+                }).includes(i.name)) {
+                    return {userID: i.userID, name: i.name}
+                } else {
+                    return undefined
+                }
             })
-        } catch (e) {    
+            loggedChannels[justlogInstance] = loggedChannels[justlogInstance].filter(i => i !== undefined)
+        } catch (e) {
             const date = new Intl.DateTimeFormat("de-de", {
-            dateStyle: "medium",
-            timeStyle: "medium",
-        }).format(new Date());
+                dateStyle: "medium",
+                timeStyle: "medium",
+            }).format(new Date());
             console.warn(`${date} ${justlogInstance}: ${e}`)
         }
     }
 }
 
 function getJustlogsDomain(channel) {
-    const justlogInstance = Object.keys(config.domains).find(justlogInstance => loggedChannels[justlogInstance].map(c =>c.name).includes(channel))
+    const justlogInstance = Object.keys(config.domains).find(justlogInstance => loggedChannels[justlogInstance].map(c => c.name).includes(channel))
     return config.domains[justlogInstance]
 }
 
