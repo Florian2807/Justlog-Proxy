@@ -1,4 +1,10 @@
-package-lock.json
-node_modules/
-.idea/
-config.json
+redirector/config.json
+
+web/node_modules
+redirector/node_modules
+
+/.idea
+
+
+web/yarn.lock
+redirector/yarn.lock
