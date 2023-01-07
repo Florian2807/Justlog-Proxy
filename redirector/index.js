@@ -182,4 +182,4 @@ function getAllChannels() {
 
 setInterval(async () => {
     await fetchLoggedChannels()
-}, 30000)
+}, 600000)
