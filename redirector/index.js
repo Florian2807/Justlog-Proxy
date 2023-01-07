@@ -8,7 +8,7 @@ const request = require('request');
 const app = express()
 
 app.get('/instances/', (req, res) => {
-    conole.log(`${date()} request: ${req.url}`)
+    console.log(`${date()} request: ${req.url}`)
     res.send(loggedChannels)
 })
 app.get('/channels', (req, res) => {
@@ -25,32 +25,32 @@ app.get('/list', (req, res) => {
 
 app.get('/channel/:channelName/user/:userName*', (req, res) => {
     res.set("Access-Control-Allow-Origin", "*")
-    conole.log(`${date()} request: ${req.url}`)
+    console.log(`${date()} request: ${req.url}`)
     requestChannelAndUser(req, res)
 })
 app.get('/channel/:channelName/userid/:userName*', (req, res) => {
-    conole.log(`${date()} request: ${req.url}`)
+    console.log(`${date()} request: ${req.url}`)
     res.set("Access-Control-Allow-Origin", "*")
     requestChannelAndUser(req, res)
 })
 app.get('/channelid/:channelName/userid/:userName*', (req, res) => {
-    conole.log(`${date()} request: ${req.url}`)
+    console.log(`${date()} request: ${req.url}`)
     res.set("Access-Control-Allow-Origin", "*")
     requestChannelAndUser(req, res)
 })
 
 app.get('/channelid/:channelName*', (req, res) => {
-    conole.log(`${date()} request: ${req.url}`)
+    console.log(`${date()} request: ${req.url}`)
     res.set("Access-Control-Allow-Origin", "*")
     requestChannel(req, res)
 })
 app.get('/channel/:channelName*', (req, res) => {
-    conole.log(`${date()} request: ${req.url}`)
+    console.log(`${date()} request: ${req.url}`)
     res.set("Access-Control-Allow-Origin", "*")
     requestChannel(req, res)
 })
 app.get('/channelid/:channelName*', (req, res) => {
-    conole.log(`${date()} request: ${req.url}`)
+    console.log(`${date()} request: ${req.url}`)
     res.set("Access-Control-Allow-Origin", "*")
     requestChannel(req, res)
 })
