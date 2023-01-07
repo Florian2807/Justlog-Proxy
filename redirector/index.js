@@ -20,6 +20,10 @@ app.get('/list', (req, res) => {
     res.set("Access-Control-Allow-Origin", "*")
     const channel = /[?&/]channel[=/]([a-zA-Z_0-9]+)/.exec(req.originalUrl)?.[1]
     const justlogDomain = getJustlogsDomain("name", channel)
+    if(!justlogDomain) {
+        res.sendStatus(404)
+        return
+    }
     req.pipe(request(`${justlogDomain}/${req.url}`)).pipe(res);
 })
 
