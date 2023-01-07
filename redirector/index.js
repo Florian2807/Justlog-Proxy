@@ -136,11 +136,12 @@ server.listen(config.port, async () => {
 })
 
 async function fetchLoggedChannels() {
+    let allChannels = {}
     for (const justlogInstance in config.domains) {
         try {
             const {channels} = await got(`${config.domains[justlogInstance]}/channels`, {retry: {limit: 2}}).json();
-            loggedChannels[justlogInstance] = channels.map(i => {
-                if (!Object.values(loggedChannels).flat().map(c => {
+            allChannels[justlogInstance] = channels.map(i => {
+                if (!Object.values(allChannels).flat().map(c => {
                     return c?.name
                 }).includes(i.name)) {
                     return {userID: i.userID, name: i.name}
@@ -148,7 +149,7 @@ async function fetchLoggedChannels() {
                     return undefined
                 }
             })
-            loggedChannels[justlogInstance] = loggedChannels[justlogInstance].filter(i => i !== undefined)
+            loggedChannels[justlogInstance] = allChannels[justlogInstance].filter(i => i)
         } catch (e) {
             const date = new Intl.DateTimeFormat("de-de", {
                 dateStyle: "medium",
@@ -181,4 +182,4 @@ function getAllChannels() {
 
 setInterval(async () => {
     await fetchLoggedChannels()
-}, 600000)
+}, 30000)
