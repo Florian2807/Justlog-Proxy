@@ -131,12 +131,9 @@ function requestChannelAndUser(req, res) {
 
 
 const server = http.createServer(app)
-const date = new Intl.DateTimeFormat("de-de", {
-    dateStyle: "medium",
-    timeStyle: "medium",
-}).format(new Date());
+
 server.listen(config.port, async () => {
-    console.log(`${date}: Server listening on port ${config.port}`)
+    console.log(`${date()}: Server listening on port ${config.port}`)
 
     await fetchLoggedChannels()
 })
