@@ -8,6 +8,7 @@ const request = require('request');
 const app = express()
 
 app.get('/instances/', (req, res) => {
+    conole.log(`${date()} request: ${req.url}`)
     res.send(loggedChannels)
 })
 app.get('/channels', (req, res) => {
@@ -24,26 +25,32 @@ app.get('/list', (req, res) => {
 
 app.get('/channel/:channelName/user/:userName*', (req, res) => {
     res.set("Access-Control-Allow-Origin", "*")
+    conole.log(`${date()} request: ${req.url}`)
     requestChannelAndUser(req, res)
 })
 app.get('/channel/:channelName/userid/:userName*', (req, res) => {
+    conole.log(`${date()} request: ${req.url}`)
     res.set("Access-Control-Allow-Origin", "*")
     requestChannelAndUser(req, res)
 })
 app.get('/channelid/:channelName/userid/:userName*', (req, res) => {
+    conole.log(`${date()} request: ${req.url}`)
     res.set("Access-Control-Allow-Origin", "*")
     requestChannelAndUser(req, res)
 })
 
 app.get('/channelid/:channelName*', (req, res) => {
+    conole.log(`${date()} request: ${req.url}`)
     res.set("Access-Control-Allow-Origin", "*")
     requestChannel(req, res)
 })
 app.get('/channel/:channelName*', (req, res) => {
+    conole.log(`${date()} request: ${req.url}`)
     res.set("Access-Control-Allow-Origin", "*")
     requestChannel(req, res)
 })
 app.get('/channelid/:channelName*', (req, res) => {
+    conole.log(`${date()} request: ${req.url}`)
     res.set("Access-Control-Allow-Origin", "*")
     requestChannel(req, res)
 })
@@ -123,7 +130,6 @@ function requestChannelAndUser(req, res) {
 }
 
 
-
 const server = http.createServer(app)
 const date = new Intl.DateTimeFormat("de-de", {
     dateStyle: "medium",
@@ -151,10 +157,7 @@ async function fetchLoggedChannels() {
             })
             loggedChannels[justlogInstance] = allChannels[justlogInstance].filter(i => i)
         } catch (e) {
-            const date = new Intl.DateTimeFormat("de-de", {
-                dateStyle: "medium",
-                timeStyle: "medium",
-            }).format(new Date());
+
             console.warn(`${date} ${justlogInstance}: ${e}`)
         }
     }
@@ -178,6 +181,13 @@ function getAllChannels() {
         })
     })
     return allChannels
+}
+
+function date() {
+    return new Intl.DateTimeFormat("de-de", {
+        dateStyle: "medium",
+        timeStyle: "medium",
+    }).format(new Date());
 }
 
 setInterval(async () => {
