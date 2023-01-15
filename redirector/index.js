@@ -159,7 +159,7 @@ async function fetchLoggedChannels() {
             loggedChannels[justlogInstance] = allChannels[justlogInstance].filter(i => i)
         } catch (e) {
 
-            console.warn(`${date} ${justlogInstance}: ${e}`)
+            console.warn(`${date()} ${justlogInstance}: ${e}`)
         }
     }
 }
