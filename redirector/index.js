@@ -89,7 +89,7 @@ function requestChannel(req, res) {
 
     if (!justlogDomain) {
         console.log('404 Channel not found')
-        // res.sendStatus(404)
+        res.status(404).send("could not load logs")
         return
     }
     const requestUrl = `${justlogDomain}/${req.originalUrl}`
