@@ -2,6 +2,7 @@ const http = require('http')
 const got = require('got')
 const express = require('express')
 const config = require('./config.json')
+const fetch = require('node-fetch');
 const loggedChannels = {}
 
 const request = require('request');
@@ -20,47 +21,48 @@ app.get('/list', (req, res) => {
     res.set("Access-Control-Allow-Origin", "*")
     const channel = /[?&/]channel[=/]([a-zA-Z_0-9]+)/.exec(req.originalUrl)?.[1]
     const justlogDomain = getJustlogsDomain("name", channel)
-    if(!justlogDomain) {
+    if (!justlogDomain) {
         res.sendStatus(404)
         return
     }
     req.pipe(request(`${justlogDomain}/${req.url}`)).pipe(res);
 })
 
-app.get('/channel/:channelName/user/:userName*', (req, res) => {
+app.get('/channel/:channelName/user/:userName/*', (req, res) => {
     res.set("Access-Control-Allow-Origin", "*")
     console.log(`${date()} request: ${req.url}`)
     requestChannelAndUser(req, res)
 })
-app.get('/channel/:channelName/userid/:userName*', (req, res) => {
+app.get('/channel/:channelName/userid/:userName/*', (req, res) => {
     console.log(`${date()} request: ${req.url}`)
     res.set("Access-Control-Allow-Origin", "*")
     requestChannelAndUser(req, res)
 })
-app.get('/channelid/:channelName/userid/:userName*', (req, res) => {
+app.get('/channelid/:channelName/userid/:userName/*', (req, res) => {
     console.log(`${date()} request: ${req.url}`)
     res.set("Access-Control-Allow-Origin", "*")
     requestChannelAndUser(req, res)
 })
 
-app.get('/channelid/:channelName*', (req, res) => {
+app.get('/channelid/:channelName/*', (req, res) => {
     console.log(`${date()} request: ${req.url}`)
     res.set("Access-Control-Allow-Origin", "*")
     requestChannel(req, res)
 })
-app.get('/channel/:channelName*', (req, res) => {
+app.get('/channel/:channelName/*', (req, res, next) => {
     console.log(`${date()} request: ${req.url}`)
     res.set("Access-Control-Allow-Origin", "*")
-    requestChannel(req, res)
+    requestChannel(req, res, next)
 })
-app.get('/channelid/:channelName*', (req, res) => {
+app.get('/channelid/:channelName/*', (req, res) => {
     console.log(`${date()} request: ${req.url}`)
     res.set("Access-Control-Allow-Origin", "*")
     requestChannel(req, res)
 })
 
 
-function requestChannel(req, res) {
+async function requestChannel(req, res, next) {
+    // res.type('text/plain')
 
     const channel = req.params.channelName
 
@@ -71,12 +73,6 @@ function requestChannel(req, res) {
         return
     }
 
-    const channelRegex = /\/([a-zA-Z_0-9]+)\/([a-zA-Z_0-9]+)\/([0-9]+)\/([0-9]+)\/([0-9]+)/
-
-    const regexTest = channelRegex.exec(req.url)
-    if (!regexTest) {
-        res.redirect(`${req.url}/${new Date().getFullYear()}/${new Date().getMonth() + 1}/${new Date().getDate()}`)
-    }
 
     const urlPath = req.url.split('?')[0].split('/').filter(i => i !== '')
     switch (urlPath[0]?.toLowerCase()) {
@@ -89,12 +85,16 @@ function requestChannel(req, res) {
 
     if (!justlogDomain) {
         console.log('404 Channel not found')
-        // res.sendStatus(404)
+        // res.send('could not load logs').status(404)
+        res.send('ASD')
         return
     }
     const requestUrl = `${justlogDomain}/${req.originalUrl}`
-    req.pipe(request(requestUrl)).pipe(res);
-    res.url = requestUrl
+    const response = await fetch(requestUrl)
+    console.log(JSON.stringify(await response.text()))
+    res.send((await response.json()))
+    const url = new URL(response.url)
+    // res.redirect(url.pathname + url.search)
 }
 
 function requestChannelAndUser(req, res) {
@@ -108,12 +108,12 @@ function requestChannelAndUser(req, res) {
         return
     }
 
-    const channelRegex = /\/([a-zA-Z_0-9]+)\/([a-zA-Z_0-9]+)\/([0-9]+)\/([0-9]+)/
-
-    const regexTest = channelRegex.exec(req.url)
-    if (!regexTest) {
-        res.redirect(`${req.url}/${new Date().getFullYear()}/${new Date().getMonth() + 1}`)
-    }
+    // const channelRegex = /\/([a-zA-Z_0-9]+)\/([a-zA-Z_0-9]+)\/([0-9]+)\/([0-9]+)/
+    //
+    // const regexTest = channelRegex.exec(req.url)
+    // if (!regexTest) {
+    //     res.redirect(`${req.url}/${new Date().getFullYear()}/${new Date().getMonth() + 1}`)
+    // }
 
     const urlPath = req.url.split('?')[0].split('/').filter(i => i !== '')
     switch (urlPath[0]?.toLowerCase()) {
