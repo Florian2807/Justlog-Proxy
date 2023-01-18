@@ -1,11 +1,11 @@
 const http = require('http')
 const got = require('got')
 const express = require('express')
-const config = require('./config.json')
-const fetch = require('node-fetch');
-const loggedChannels = {}
-
 const request = require('request');
+
+const config = require('./config.json')
+
+const loggedChannels = {}
 const app = express()
 
 app.get('/instances/', (req, res) => {
@@ -16,6 +16,8 @@ app.get('/channels', (req, res) => {
     res.set("Access-Control-Allow-Origin", "*")
     res.send({channels: getAllChannels().sort((a, b) => a.name.localeCompare(b.name))})
 })
+
+app.get('/favicon.ico', (req, res) => res.status(204))
 
 app.get('/list', (req, res) => {
     res.set("Access-Control-Allow-Origin", "*")
@@ -28,78 +30,60 @@ app.get('/list', (req, res) => {
     req.pipe(request(`${justlogDomain}/${req.url}`)).pipe(res);
 })
 
-app.get('/channel/:channelName/user/:userName/*', (req, res) => {
-    res.set("Access-Control-Allow-Origin", "*")
-    console.log(`${date()} request: ${req.url}`)
-    requestChannelAndUser(req, res)
-})
-app.get('/channel/:channelName/userid/:userName/*', (req, res) => {
-    console.log(`${date()} request: ${req.url}`)
-    res.set("Access-Control-Allow-Origin", "*")
-    requestChannelAndUser(req, res)
-})
-app.get('/channelid/:channelName/userid/:userName/*', (req, res) => {
-    console.log(`${date()} request: ${req.url}`)
-    res.set("Access-Control-Allow-Origin", "*")
-    requestChannelAndUser(req, res)
-})
 
-app.get('/channelid/:channelName/*', (req, res) => {
-    console.log(`${date()} request: ${req.url}`)
-    res.set("Access-Control-Allow-Origin", "*")
-    requestChannel(req, res)
-})
-app.get('/channel/:channelName/*', (req, res, next) => {
-    console.log(`${date()} request: ${req.url}`)
-    res.set("Access-Control-Allow-Origin", "*")
-    requestChannel(req, res, next)
-})
-app.get('/channelid/:channelName/*', (req, res) => {
-    console.log(`${date()} request: ${req.url}`)
-    res.set("Access-Control-Allow-Origin", "*")
-    requestChannel(req, res)
-})
+app.get('/*', async (req, res) => {
+    res.type('text/plain')
+    const url = new URL(req.protocol + '://' + req.get('host') + req.originalUrl)
 
+    const path = url.pathname.split("/")
+    path.shift()
+    if (/\/(channel|channelid)\/\w+\/?$/gm.test(url.pathname)) {
 
-async function requestChannel(req, res, next) {
-    // res.type('text/plain')
+        await parseUrl(path, req, res)
 
-    const channel = req.params.channelName
-
-    let justlogDomain
-    if (!channel) {
-        console.log("no channel specified")
-        res.sendStatus(404)
-        return
+    } else if (/\/(channel|channelid)\/\w+\/(user|userid)\/\w+\/?$/gm.test(url.pathname)) {
+        await parseUrl(path, req, res)
+    } else if (/\/(channel|channelid)\/\w+\/\d+\/\d{1,2}/gm.test(req.url) || /\/(channel|channelid)\/\w+\/(user|userid)\/\w+\/\d+\/\d{1,2}/gm.test(req.url)) { // /channel/:channelName/:year/:month/:day
+        requestChannel(path, req, res)
+    } else {
+        res.send('404 page not found').status(404)
     }
 
 
-    const urlPath = req.url.split('?')[0].split('/').filter(i => i !== '')
-    switch (urlPath[0]?.toLowerCase()) {
+})
+
+
+async function parseUrl(path, req, res) {
+
+    if (!path[1]?.toLowerCase()) {
+        console.log("no channel specified")
+        res.send('could not load logs').status(404)
+        return
+    }
+
+    let justlogDomain
+    switch (path[0]?.toLowerCase()) {
         case 'channel':
-            justlogDomain = getJustlogsDomain("name", channel)
+            justlogDomain = getJustlogsDomain("name", path[1]?.toLowerCase())
             break
         case 'channelid':
-            justlogDomain = getJustlogsDomain("id", channel)
+            justlogDomain = getJustlogsDomain("id", path[1]?.toLowerCase())
     }
 
     if (!justlogDomain) {
         console.log('404 Channel not found')
-        // res.send('could not load logs').status(404)
-        res.send('ASD')
+        res.send('could not load logs').status(404)
         return
     }
     const requestUrl = `${justlogDomain}/${req.originalUrl}`
-    const response = await fetch(requestUrl)
-    console.log(JSON.stringify(await response.text()))
-    res.send((await response.json()))
-    const url = new URL(response.url)
-    // res.redirect(url.pathname + url.search)
+    const redirectPath = new URL((await got(requestUrl)).redirectUrls[1]).pathname
+    console.log(redirectPath)
+    return res.redirect(redirectPath)
 }
 
-function requestChannelAndUser(req, res) {
+function requestChannel(path, req, res) {
 
-    const channel = req.params.channelName
+    const channel = path[1]?.toLowerCase()
 
     let justlogDomain
     if (!channel) {
@@ -108,15 +92,8 @@ function requestChannelAndUser(req, res) {
         return
     }
 
-    // const channelRegex = /\/([a-zA-Z_0-9]+)\/([a-zA-Z_0-9]+)\/([0-9]+)\/([0-9]+)/
-    //
-    // const regexTest = channelRegex.exec(req.url)
-    // if (!regexTest) {
-    //     res.redirect(`${req.url}/${new Date().getFullYear()}/${new Date().getMonth() + 1}`)
-    // }
 
-    const urlPath = req.url.split('?')[0].split('/').filter(i => i !== '')
-    switch (urlPath[0]?.toLowerCase()) {
+    switch (path[0]?.toLowerCase()) {
         case 'channel':
             justlogDomain = getJustlogsDomain("name", channel)
             break
@@ -125,7 +102,7 @@ function requestChannelAndUser(req, res) {
     }
     if (!justlogDomain) {
         console.log('404 Channel not found')
-        // res.sendStatus(404)
+        res.sendStatus(404)
         return
     }
     const requestUrl = `${justlogDomain}/${req.originalUrl}`
@@ -159,7 +136,7 @@ async function fetchLoggedChannels() {
             loggedChannels[justlogInstance] = allChannels[justlogInstance].filter(i => i)
         } catch (e) {
 
-            console.warn(`${date} ${justlogInstance}: ${e}`)
+            console.warn(`${date()} ${justlogInstance}: ${e}`)
         }
     }
 }
