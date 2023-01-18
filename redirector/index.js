@@ -1,166 +1,158 @@
-const http = require('http')
-const got = require('got')
-const express = require('express')
-const config = require('./config.json')
-const loggedChannels = {}
+const http = require("http");
+const got = require("got");
+const express = require("express");
+const request = require("request");
 
-const request = require('request');
-const app = express()
+const config = require("./config.json");
 
-app.get('/instances/', (req, res) => {
-    console.log(`${date()} request: ${req.url}`)
-    res.send(loggedChannels)
-})
-app.get('/channels', (req, res) => {
-    res.set("Access-Control-Allow-Origin", "*")
-    res.send({channels: getAllChannels().sort((a, b) => a.name.localeCompare(b.name))})
-})
+const loggedChannels = {};
+const app = express();
 
-app.get('/list', (req, res) => {
-    res.set("Access-Control-Allow-Origin", "*")
-    const channel = /[?&/]channel[=/]([a-zA-Z_0-9]+)/.exec(req.originalUrl)?.[1]
-    const justlogDomain = getJustlogsDomain("name", channel)
-    if(!justlogDomain) {
-        res.sendStatus(404)
-        return
+app.get("/instances/", (req, res) => {
+    console.log(`${date()} request: ${req.url}`);
+    res.send(loggedChannels);
+});
+app.get("/channels", (req, res) => {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.send({
+        channels: getAllChannels().sort((a, b) => a.name.localeCompare(b.name)),
+    });
+});
+
+app.get("/favicon.ico", (req, res) => res.status(204));
+
+app.get("/list", (req, res) => {
+    res.set("Access-Control-Allow-Origin", "*");
+    const channel = /[?&/]channel[=/]([a-zA-Z_0-9]+)/.exec(
+        req.originalUrl
+    )?.[1];
+    const justlogDomain = getJustlogsDomain("name", channel);
+    if (!justlogDomain) {
+        res.sendStatus(404);
+        return;
     }
     req.pipe(request(`${justlogDomain}/${req.url}`)).pipe(res);
-})
+});
 
-app.get('/channel/:channelName/user/:userName*', (req, res) => {
-    res.set("Access-Control-Allow-Origin", "*")
-    console.log(`${date()} request: ${req.url}`)
-    requestChannelAndUser(req, res)
-})
-app.get('/channel/:channelName/userid/:userName*', (req, res) => {
-    console.log(`${date()} request: ${req.url}`)
-    res.set("Access-Control-Allow-Origin", "*")
-    requestChannelAndUser(req, res)
-})
-app.get('/channelid/:channelName/userid/:userName*', (req, res) => {
-    console.log(`${date()} request: ${req.url}`)
-    res.set("Access-Control-Allow-Origin", "*")
-    requestChannelAndUser(req, res)
-})
+app.get("/*", async (req, res) => {
+    res.type("text/plain");
+    const url = new URL(
+        req.protocol + "://" + req.get("host") + req.originalUrl
+    );
 
-app.get('/channelid/:channelName*', (req, res) => {
-    console.log(`${date()} request: ${req.url}`)
-    res.set("Access-Control-Allow-Origin", "*")
-    requestChannel(req, res)
-})
-app.get('/channel/:channelName*', (req, res) => {
-    console.log(`${date()} request: ${req.url}`)
-    res.set("Access-Control-Allow-Origin", "*")
-    requestChannel(req, res)
-})
-app.get('/channelid/:channelName*', (req, res) => {
-    console.log(`${date()} request: ${req.url}`)
-    res.set("Access-Control-Allow-Origin", "*")
-    requestChannel(req, res)
-})
+    const path = url.pathname.split("/");
+    path.shift();
+    if (/\/(channel|channelid)\/\w+\/?$/gm.test(url.pathname)) {
+        await parseUrl(path, req, res);
+    } else if (
+        /\/(channel|channelid)\/\w+\/(user|userid)\/\w+\/?$/gm.test(
+            url.pathname
+        )
+    ) {
+        await parseUrl(path, req, res);
+    } else if (
+        /\/(channel|channelid)\/\w+\/\d+\/\d{1,2}/gm.test(req.url) ||
+        /\/(channel|channelid)\/\w+\/(user|userid)\/\w+\/\d+\/\d{1,2}/gm.test(
+            req.url
+        )
+    ) {
+        // /channel/:channelName/:year/:month/:day
+        requestChannel(path, req, res);
+    } else {
+        res.send("404 page not found").status(404);
+    }
+});
 
-
-function requestChannel(req, res) {
-
-    const channel = req.params.channelName
-
-    let justlogDomain
-    if (!channel) {
-        console.log("no channel specified")
-        res.sendStatus(404)
-        return
+async function parseUrl(path, req, res) {
+    if (!path[1]?.toLowerCase()) {
+        console.log("no channel specified");
+        res.send("could not load logs").status(404);
+        return;
     }
 
-    const channelRegex = /\/([a-zA-Z_0-9]+)\/([a-zA-Z_0-9]+)\/([0-9]+)\/([0-9]+)\/([0-9]+)/
-
-    const regexTest = channelRegex.exec(req.url)
-    if (!regexTest) {
-        res.redirect(`${req.url}/${new Date().getFullYear()}/${new Date().getMonth() + 1}/${new Date().getDate()}`)
-    }
-
-    const urlPath = req.url.split('?')[0].split('/').filter(i => i !== '')
-    switch (urlPath[0]?.toLowerCase()) {
-        case 'channel':
-            justlogDomain = getJustlogsDomain("name", channel)
-            break
-        case 'channelid':
-            justlogDomain = getJustlogsDomain("id", channel)
+    let justlogDomain;
+    switch (path[0]?.toLowerCase()) {
+        case "channel":
+            justlogDomain = getJustlogsDomain("name", path[1]?.toLowerCase());
+            break;
+        case "channelid":
+            justlogDomain = getJustlogsDomain("id", path[1]?.toLowerCase());
     }
 
     if (!justlogDomain) {
-        res.type('text/plain')
-        console.log('404 Channel not found')
-        res.status(404).send("could not load logs")
-        return
+        console.log("404 Channel not found");
+        res.send("could not load logs").status(404);
+        return;
     }
-    const requestUrl = `${justlogDomain}/${req.originalUrl}`
-    req.pipe(request(requestUrl)).pipe(res);
-    res.url = requestUrl
+    const requestUrl = `${justlogDomain}/${req.originalUrl}`;
+    const redirectPath = new URL((await got(requestUrl)).redirectUrls[1])
+        .pathname;
+    console.log(redirectPath);
+    return res.redirect(redirectPath);
 }
 
-function requestChannelAndUser(req, res) {
+function requestChannel(path, req, res) {
+    const channel = path[1]?.toLowerCase();
 
-    const channel = req.params.channelName
-
-    let justlogDomain
+    let justlogDomain;
     if (!channel) {
-        console.log("no channel specified")
-        res.sendStatus(404)
-        return
+        console.log("no channel specified");
+        res.sendStatus(404);
+        return;
     }
 
-    const channelRegex = /\/([a-zA-Z_0-9]+)\/([a-zA-Z_0-9]+)\/([0-9]+)\/([0-9]+)/
-
-    const regexTest = channelRegex.exec(req.url)
-    if (!regexTest) {
-        res.redirect(`${req.url}/${new Date().getFullYear()}/${new Date().getMonth() + 1}`)
-    }
-
-    const urlPath = req.url.split('?')[0].split('/').filter(i => i !== '')
-    switch (urlPath[0]?.toLowerCase()) {
-        case 'channel':
-            justlogDomain = getJustlogsDomain("name", channel)
-            break
-        case 'channelid':
-            justlogDomain = getJustlogsDomain("id", channel)
+    switch (path[0]?.toLowerCase()) {
+        case "channel":
+            justlogDomain = getJustlogsDomain("name", channel);
+            break;
+        case "channelid":
+            justlogDomain = getJustlogsDomain("id", channel);
     }
     if (!justlogDomain) {
-        res.type('text/plain')
-        console.log('404 Channel not found')
-        res.status(404).send("could not load logs")
-        return
+
+        console.log("404 Channel not found");
+        res.sendStatus(404);
+        return;
     }
-    const requestUrl = `${justlogDomain}/${req.originalUrl}`
+    const requestUrl = `${justlogDomain}/${req.originalUrl}`;
     req.pipe(request(requestUrl)).pipe(res);
-    res.url = requestUrl
+    res.url = requestUrl;
 }
 
-
-const server = http.createServer(app)
+const server = http.createServer(app);
 
 server.listen(config.port, async () => {
-    console.log(`${date()}: Server listening on port ${config.port}`)
+    console.log(`${date()}: Server listening on port ${config.port}`);
 
-    await fetchLoggedChannels()
-})
+    await fetchLoggedChannels();
+});
 
 async function fetchLoggedChannels() {
-    let allChannels = {}
+    let allChannels = {};
     for (const justlogInstance in config.domains) {
         try {
-            const {channels} = await got(`${config.domains[justlogInstance]}/channels`, {retry: {limit: 2}}).json();
-            allChannels[justlogInstance] = channels.map(i => {
-                if (!Object.values(allChannels).flat().map(c => {
-                    return c?.name
-                }).includes(i.name)) {
-                    return {userID: i.userID, name: i.name}
+            const { channels } = await got(
+                `${config.domains[justlogInstance]}/channels`,
+                { retry: { limit: 2 } }
+            ).json();
+            allChannels[justlogInstance] = channels.map((i) => {
+                if (
+                    !Object.values(allChannels)
+                        .flat()
+                        .map((c) => {
+                            return c?.name;
+                        })
+                        .includes(i.name)
+                ) {
+                    return { userID: i.userID, name: i.name };
                 } else {
-                    return undefined
+                    return undefined;
                 }
-            })
-            loggedChannels[justlogInstance] = allChannels[justlogInstance].filter(i => i)
+            });
+            loggedChannels[justlogInstance] = allChannels[
+                justlogInstance
+            ].filter((i) => i);
         } catch (e) {
-
             console.warn(`${date()} ${justlogInstance}: ${e}`)
         }
     }
@@ -168,22 +160,32 @@ async function fetchLoggedChannels() {
 
 function getJustlogsDomain(source, channel) {
     if (source === "name") {
-        const justlogInstance = Object.keys(config.domains).find(justlogInstance => loggedChannels[justlogInstance]?.map(c => c.name).includes(channel))
-        return config.domains[justlogInstance]
+        const justlogInstance = Object.keys(config.domains).find(
+            (justlogInstance) =>
+                loggedChannels[justlogInstance]
+                    ?.map((c) => c.name)
+                    .includes(channel)
+        );
+        return config.domains[justlogInstance];
     } else if (source === "id") {
-        const justlogInstance = Object.keys(config.domains).find(justlogInstance => loggedChannels[justlogInstance]?.map(c => c.userID).includes(channel))
-        return config.domains[justlogInstance]
+        const justlogInstance = Object.keys(config.domains).find(
+            (justlogInstance) =>
+                loggedChannels[justlogInstance]
+                    ?.map((c) => c.userID)
+                    .includes(channel)
+        );
+        return config.domains[justlogInstance];
     }
 }
 
 function getAllChannels() {
     let allChannels = [];
-    Object.keys(loggedChannels).forEach(instances => {
-        loggedChannels[instances].forEach(channel => {
+    Object.keys(loggedChannels).forEach((instances) => {
+        loggedChannels[instances].forEach((channel) => {
             allChannels.push(channel);
-        })
-    })
-    return allChannels
+        });
+    });
+    return allChannels;
 }
 
 function date() {
@@ -194,5 +196,5 @@ function date() {
 }
 
 setInterval(async () => {
-    await fetchLoggedChannels()
-}, 600000)
+    await fetchLoggedChannels();
+}, 600000);
