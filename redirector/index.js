@@ -109,6 +109,7 @@ function requestChannel(path, req, res) {
             justlogDomain = getJustlogsDomain("id", channel);
     }
     if (!justlogDomain) {
+
         console.log("404 Channel not found");
         res.sendStatus(404);
         return;
@@ -152,7 +153,7 @@ async function fetchLoggedChannels() {
                 justlogInstance
             ].filter((i) => i);
         } catch (e) {
-            console.warn(`${date()} ${justlogInstance}: ${e}`);
+            console.warn(`${date()} ${justlogInstance}: ${e}`)
         }
     }
 }
