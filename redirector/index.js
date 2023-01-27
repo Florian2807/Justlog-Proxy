@@ -65,7 +65,6 @@ app.get("/*", async (req, res) => {
 
 async function parseUrl(path, req, res) {
     if (!path[1]?.toLowerCase()) {
-        console.log("no channel specified");
         res.send("could not load logs").status(404);
         return;
     }
@@ -80,14 +79,13 @@ async function parseUrl(path, req, res) {
     }
 
     if (!justlogDomain) {
-        console.log("404 Channel not found");
         res.send("could not load logs").status(404);
         return;
     }
     const requestUrl = `${justlogDomain}/${req.originalUrl}`;
     const redirectPath = new URL((await got(requestUrl, {retry: { limit: 2 }})).redirectUrls[1])
         .pathname;
-    console.log(redirectPath);
+    console.log(date(), redirectPath);
     return res.redirect(redirectPath);
 }
 
@@ -96,7 +94,6 @@ function requestChannel(path, req, res) {
 
     let justlogDomain;
     if (!channel) {
-        console.log("no channel specified");
         res.sendStatus(404);
         return;
     }
@@ -109,8 +106,6 @@ function requestChannel(path, req, res) {
             justlogDomain = getJustlogsDomain("id", channel);
     }
     if (!justlogDomain) {
-
-        console.log("404 Channel not found");
         res.sendStatus(404);
         return;
     }
