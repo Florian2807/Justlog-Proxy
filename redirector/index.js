@@ -36,6 +36,7 @@ app.get("/list", (req, res) => {
 
 app.get("/*", async (req, res) => {
     res.type("text/plain");
+    console.log(date(), req.url);
     const url = new URL(
         req.protocol + "://" + req.get("host") + req.originalUrl
     );
@@ -85,7 +86,6 @@ async function parseUrl(path, req, res) {
     const requestUrl = `${justlogDomain}/${req.originalUrl}`;
     const redirectPath = new URL((await got(requestUrl, {retry: { limit: 2 }})).redirectUrls[1])
         .pathname;
-    console.log(date(), redirectPath);
     return res.redirect(redirectPath);
 }
 
