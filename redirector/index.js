@@ -85,7 +85,7 @@ async function parseUrl(path, req, res) {
         return;
     }
     const requestUrl = `${justlogDomain}/${req.originalUrl}`;
-    const redirectPath = new URL((await got(requestUrl)).redirectUrls[1])
+    const redirectPath = new URL((await got(requestUrl, {retry: { limit: 2 }})).redirectUrls[1])
         .pathname;
     console.log(redirectPath);
     return res.redirect(redirectPath);
