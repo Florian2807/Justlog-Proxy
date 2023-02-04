@@ -26,8 +26,8 @@ app.get("/list", (req, res) => {
     const channel = /[?&/]channel[=/]([a-zA-Z_0-9]+)/.exec(
         req.originalUrl
     )?.[1];
-
-    let justlogDomain = getUrlOfInstanceParam(req, res, req.originalUrl.split("/"), channel);
+    let justlogDomain = getUrlOfInstanceParam(req, res, req.path.substring(1).split("/"), channel);
+    if (!justlogDomain) return;
 
     req.pipe(request(`${justlogDomain}/${req.url}`)).pipe(res);
 });
@@ -94,6 +94,7 @@ function requestChannel(path, req, res) {
 
 function getUrlOfInstanceParam(req, res, path, channel) {
     let justlogDomain
+    if (path[0] === "list") path[0] = "channel"
     let instanceParam = testInstanceParam(req.query.instance);
     if (!instanceParam?.error) {
         if (instanceParam.url === undefined) {
@@ -102,7 +103,7 @@ function getUrlOfInstanceParam(req, res, path, channel) {
             justlogDomain = instanceParam.url;
         }
     } else {
-        res.send("could not load logs 3").status(404);
+        res.send("could not load logs").status(404);
         return;
     }
     return justlogDomain
