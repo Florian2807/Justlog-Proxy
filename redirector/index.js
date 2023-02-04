@@ -12,6 +12,12 @@ app.get("/instances", (req, res) => {
     console.log(`${date()} request: ${req.url}`);
     res.send(loggedChannels);
 });
+
+app.get("/domains", (req, res) => {
+    console.log(`${date()} request: ${req.url}`);
+    res.send(config.domains);
+});
+
 app.get("/channels", (req, res) => {
     res.set("Access-Control-Allow-Origin", "*");
     res.send({
