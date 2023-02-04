@@ -119,9 +119,8 @@ function getUrlOfInstanceParam(req, res, path, channel) {
 function testInstanceParam(instanceParam) {
     // TODO REGEX FOR THAT SHIT
     if (!instanceParam) return {error: false, url: undefined}
-    if (instanceParam.replace("https://", "").includes("/")) return {error: true, url: undefined}
-    if (Object.values(config.domains).includes("https://" + instanceParam)) {
-        return {error: false, url: "https://" + instanceParam}
+    if (Object.keys(config.domains).includes(instanceParam)) {
+        return {error: false, url: config.domains[instanceParam]}
     } else {
         return {error: true, url: undefined};
     }
