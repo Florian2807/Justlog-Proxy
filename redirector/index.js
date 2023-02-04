@@ -8,7 +8,7 @@ const config = require("./config.json");
 const loggedChannels = {};
 const app = express();
 
-app.get("/instances/", (req, res) => {
+app.get("/instances", (req, res) => {
     console.log(`${date()} request: ${req.url}`);
     res.send(loggedChannels);
 });
@@ -26,11 +26,9 @@ app.get("/list", (req, res) => {
     const channel = /[?&/]channel[=/]([a-zA-Z_0-9]+)/.exec(
         req.originalUrl
     )?.[1];
-    const justlogDomain = getJustlogsDomain("name", channel);
-    if (!justlogDomain) {
-        res.sendStatus(404);
-        return;
-    }
+
+    let justlogDomain = getUrlOfInstanceParam(req, res, req.originalUrl.split("/"), channel);
+
     req.pipe(request(`${justlogDomain}/${req.url}`)).pipe(res);
 });
 
@@ -38,7 +36,7 @@ app.get("/*", async (req, res) => {
     res.type("text/plain");
     console.log(date(), req.url);
     const url = new URL(
-        req.protocol + "://" + req.get("host") + req.originalUrl
+        req.protocol + "://" + req.get("host") + req.originalUrl + req.search
     );
 
     const path = url.pathname.split("/");
@@ -60,7 +58,7 @@ app.get("/*", async (req, res) => {
         // /channel/:channelName/:year/:month/:day
         requestChannel(path, req, res);
     } else {
-        res.send("404 page not found").status(404);
+        res.send("could not load logs").status(404);
     }
 });
 
@@ -70,65 +68,65 @@ async function parseUrl(path, req, res) {
         return;
     }
 
-    let justlogDomain;
-    switch (path[0]?.toLowerCase()) {
-        case "channel":
-            justlogDomain = getJustlogsDomain("name", path[1]?.toLowerCase());
-            break;
-        case "channelid":
-            justlogDomain = getJustlogsDomain("id", path[1]?.toLowerCase());
-    }
+    let justlogDomain = getUrlOfInstanceParam(req, res, path, path[1].toLowerCase());
 
-    if (!justlogDomain) {
-        res.send("could not load logs").status(404);
-        return;
-    }
     const requestUrl = `${justlogDomain}/${req.originalUrl}`;
-    const redirectPath = new URL((await got(requestUrl, {retry: { limit: 2 }})).redirectUrls[1])
+    const redirectPath = new URL((await got(requestUrl, {retry: {limit: 2}, throwHttpErrors: false})).redirectUrls[1])
         .pathname;
-    return res.redirect(redirectPath);
+    return res.redirect(redirectPath + req.originalUrl.replace(/^[^?]*/, ''));
 }
 
 function requestChannel(path, req, res) {
     const channel = path[1]?.toLowerCase();
 
-    let justlogDomain;
     if (!channel) {
-        res.sendStatus(404);
+        res.send("could not load logs").status(404);
         return;
     }
 
-    switch (path[0]?.toLowerCase()) {
-        case "channel":
-            justlogDomain = getJustlogsDomain("name", channel);
-            break;
-        case "channelid":
-            justlogDomain = getJustlogsDomain("id", channel);
-    }
-    if (!justlogDomain) {
-        res.sendStatus(404);
-        return;
-    }
+    let justlogDomain = getUrlOfInstanceParam(req, res, path, channel);
+    if (!justlogDomain) return;
+
     const requestUrl = `${justlogDomain}/${req.originalUrl}`;
     req.pipe(request(requestUrl)).pipe(res);
     res.url = requestUrl;
 }
 
-const server = http.createServer(app);
+function getUrlOfInstanceParam(req, res, path, channel) {
+    let justlogDomain
+    let instanceParam = testInstanceParam(req.query.instance);
+    if (!instanceParam?.error) {
+        if (instanceParam.url === undefined) {
+            justlogDomain = getJustlogsDomain(path[0].toLowerCase(), channel);
+        } else {
+            justlogDomain = instanceParam.url;
+        }
+    } else {
+        res.send("could not load logs 3").status(404);
+        return;
+    }
+    return justlogDomain
+}
 
-server.listen(config.port, async () => {
-    console.log(`${date()}: Server listening on port ${config.port}`);
 
-    await fetchLoggedChannels();
-});
+function testInstanceParam(instanceParam) {
+    // TODO REGEX FOR THAT SHIT
+    if (!instanceParam) return {error: false, url: undefined}
+    if (instanceParam.replace("https://", "").includes("/")) return {error: true, url: undefined}
+    if (Object.values(config.domains).includes("https://" + instanceParam)) {
+        return {error: false, url: "https://" + instanceParam}
+    } else {
+        return {error: true, url: undefined};
+    }
+}
 
 async function fetchLoggedChannels() {
     let allChannels = {};
     for (const justlogInstance in config.domains) {
         try {
-            const { channels } = await got(
+            const {channels} = await got(
                 `${config.domains[justlogInstance]}/channels`,
-                { retry: { limit: 2 } }
+                {retry: {limit: 2}}
             ).json();
             allChannels[justlogInstance] = channels.map((i) => {
                 if (
@@ -139,14 +137,14 @@ async function fetchLoggedChannels() {
                         })
                         .includes(i.name)
                 ) {
-                    return { userID: i.userID, name: i.name };
+                    return {userID: i.userID, name: i.name};
                 } else {
                     return undefined;
                 }
             });
             loggedChannels[justlogInstance] = allChannels[
                 justlogInstance
-            ].filter((i) => i);
+                ].filter((i) => i);
         } catch (e) {
             console.warn(`${date()} ${justlogInstance}: ${e}`)
         }
@@ -154,7 +152,7 @@ async function fetchLoggedChannels() {
 }
 
 function getJustlogsDomain(source, channel) {
-    if (source === "name") {
+    if (source === "channel") {
         const justlogInstance = Object.keys(config.domains).find(
             (justlogInstance) =>
                 loggedChannels[justlogInstance]
@@ -162,7 +160,7 @@ function getJustlogsDomain(source, channel) {
                     .includes(channel)
         );
         return config.domains[justlogInstance];
-    } else if (source === "id") {
+    } else if (source === "channelid") {
         const justlogInstance = Object.keys(config.domains).find(
             (justlogInstance) =>
                 loggedChannels[justlogInstance]
@@ -193,3 +191,12 @@ function date() {
 setInterval(async () => {
     await fetchLoggedChannels();
 }, 600000);
+
+
+const server = http.createServer(app);
+
+server.listen(config.port, async () => {
+    console.log(`${date()}: Server listening on port ${config.port}`);
+
+    await fetchLoggedChannels();
+});
