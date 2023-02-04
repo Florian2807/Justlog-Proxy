@@ -36,7 +36,7 @@ app.get("/*", async (req, res) => {
     res.type("text/plain");
     console.log(date(), req.url);
     const url = new URL(
-        req.protocol + "://" + req.get("host") + req.originalUrl + req.search
+        req.protocol + "://" + req.get("host") + req.originalUrl + (req.search ?? "")
     );
 
     const path = url.pathname.split("/");
@@ -67,8 +67,8 @@ async function parseUrl(path, req, res) {
         res.send("could not load logs").status(404);
         return;
     }
-
     let justlogDomain = getUrlOfInstanceParam(req, res, path, path[1].toLowerCase());
+    if (!justlogDomain) return;
 
     const requestUrl = `${justlogDomain}/${req.originalUrl}`;
     const redirectPath = new URL((await got(requestUrl, {retry: {limit: 2}, throwHttpErrors: false})).redirectUrls[1])
