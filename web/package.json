@@ -20,7 +20,7 @@
         "web-vitals": "^2.1.4"
     },
     "scripts": {
-        "start": "react-scripts start PORT=1112"
+        "start": "PORT=1112 react-scripts start"
     },
     "eslintConfig": {
         "extends": [
