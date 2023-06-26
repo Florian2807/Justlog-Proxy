@@ -34,8 +34,7 @@ app.get("/list", (req, res) => {
     )?.[1];
     let justlogDomain = getUrlOfInstanceParam(req, res, req.path.substring(1).split("/"), channel);
     if (!justlogDomain) return;
-
-    req.pipe(request(`${justlogDomain}/${req.url}`)).pipe(res);
+    req.pipe(request(`${justlogDomain}${req.url}`)).pipe(res);
 });
 
 app.get("/*", async (req, res) => {
