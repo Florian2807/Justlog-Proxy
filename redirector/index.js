@@ -63,7 +63,7 @@ app.get("/*", async (req, res) => {
         // /channel/:channelName/:year/:month/:day
         requestChannel(path, req, res);
     } else {
-        res.send("could not load logs").status(404);
+        res.send("page not found").status(404);
     }
 });
 
@@ -91,8 +91,7 @@ function requestChannel(path, req, res) {
 
     let justlogDomain = getUrlOfInstanceParam(req, res, path, channel);
     if (!justlogDomain) return;
-
-    const requestUrl = `${justlogDomain}/${req.originalUrl}`;
+    const requestUrl = justlogDomain + req.originalUrl;
     req.pipe(request(requestUrl)).pipe(res);
     res.url = requestUrl;
 }
