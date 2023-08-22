@@ -128,14 +128,18 @@ async function fetchLoggedChannels() {
     let allChannels = {};
     for (const justlogInstance in config.domains) {
         try {
-            const {channels} = await got(
+            const body = await got(
                 `${config.domains[justlogInstance]}/channels`, {
                     headers: {
                         "User-Agent": "Justlog-Channel-Lister/Florian_2807"
                     },
                     retry: {limit: 2}
                 }
-            ).json();
+            ).json()
+            if (JSON.stringify(body).startsWith('<html>')) {
+                return console.log('html site detected')
+            }
+            const channels = body.channels
             allChannels[justlogInstance] = channels.map((i) => {
                 if (
                     !Object.values(allChannels)
