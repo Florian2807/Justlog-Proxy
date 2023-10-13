@@ -55,7 +55,10 @@ app.get("/*", async (req, res) => {
     ) {
         await parseUrl(path, req, res);
     } else if (
-        /\/(channel|channelid)\/\w+\/\d+\/\d{1,2}/gm.test(req.url) ||
+        /\/(channel|channelid)\/\w+\/random?$/gm.test(req.url) ||
+        /\/(channel|channelid)\/\w+\/(user|userid)\/\w+\/random?$/gm.test(req.url) ||
+        /\/(channel|channelid)\/\w+\/random?$/gm.test(req.url) ||
+        /(channel|channelid)\/\w+\/\d+\/\d{1,2}/gm.test(req.url) ||
         /\/(channel|channelid)\/\w+\/(user|userid)\/\w+\/\d+\/\d{1,2}/gm.test(
             req.url
         )
@@ -63,6 +66,7 @@ app.get("/*", async (req, res) => {
         // /channel/:channelName/:year/:month/:day
         requestChannel(path, req, res);
     } else {
+        console.log('ASD')
         res.send("page not found").status(404);
     }
 });
@@ -76,7 +80,11 @@ async function parseUrl(path, req, res) {
     if (!justlogDomain) return;
 
     const requestUrl = `${justlogDomain}/${req.originalUrl}`;
-    const redirectPath = new URL((await got(requestUrl, {retry: {limit: 2}, throwHttpErrors: false, followRedirect: true})).redirectUrls[0])
+    const redirectPath = new URL((await got(requestUrl, {
+        retry: {limit: 2},
+        throwHttpErrors: false,
+        followRedirect: true
+    })).redirectUrls[0])
         .pathname;
     return res.redirect(redirectPath + req.originalUrl.replace(/^[^?]*/, ''));
 }
