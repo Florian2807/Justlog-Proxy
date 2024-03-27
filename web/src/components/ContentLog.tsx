@@ -1,5 +1,5 @@
-import { InputAdornment, TextField } from "@material-ui/core";
-import { Search } from "@material-ui/icons";
+import { InputAdornment, TextField } from "@mui/material";
+import { Search } from "@mui/icons-material";
 import React, { useContext, useState, CSSProperties, useRef, useEffect } from "react";
 import styled from "styled-components";
 import { useLog } from "../hooks/useLog";
@@ -8,24 +8,24 @@ import { LogLine } from "./LogLine";
 import { FixedSizeList as List } from 'react-window';
 
 const ContentLogContainer = styled.ul`
-    padding: 0;
-    margin: 0;
-    position: relative;
+  padding: 0;
+  margin: 0;
+  position: relative;
 
-    .search {
-        position: absolute;
-        top: -52px;
-        width: 320px;
-        left: 0;
-    }
+  .search {
+    position: absolute;
+    top: -52px;
+    width: 320px;
+    left: 0;
+  }
 
-    .logLine {
-        white-space: nowrap;
-    }
+  .logLine {
+    white-space: nowrap;
+  }
 
-    .list {
-        scrollbar-color: dark;
-    }
+  .list {
+    scrollbar-color: #90caf9 #616161;
+  }
 `;
 
 export function ContentLog({ year, month }: { year: string, month: string }) {

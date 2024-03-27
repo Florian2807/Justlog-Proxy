@@ -1,6 +1,7 @@
 import { createContext, useState } from "react";
 import { QueryClient } from 'react-query';
 import { useLocalStorage } from "./hooks/useLocalStorage";
+
 export interface Settings {
     showEmotes: Setting,
     showName: Setting,
@@ -9,6 +10,13 @@ export interface Settings {
     newOnBottom: Setting,
 }
 
+export enum LocalStorageSettings {
+    showEmotes,
+    showName,
+    showTimestamp,
+    twitchChatMode,
+    newOnBottom,
+}
 
 export interface Setting {
     displayName: string,
@@ -32,7 +40,7 @@ const url = new URL(window.location.href);
 const defaultContext = {
     state: {
         queryClient: new QueryClient(),
-        apiBaseUrl: "http://localhost:5001",
+        apiBaseUrl: "http://localhost:1111",
         settings: {
             showEmotes: {
                 displayName: "Show Emotes",

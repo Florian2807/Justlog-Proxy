@@ -1,0 +1,1305 @@
+{
+    "consumes": [
+        "application/json",
+        "application/xml"
+    ],
+    "produces": [
+        "application/json",
+        "text/plain"
+    ],
+    "schemes": [
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "https://github.com/Florian2807/JustlogRedirector",
+        "title": "JustLog Redirector API",
+        "version": "1.0.0"
+    },
+    "basePath": "/",
+    "paths": {
+        "/channel/{channel}": {
+            "get": {
+                "description": "Get entire channel logs of current day",
+                "produces": [
+                    "application/json",
+                    "text/plain"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "operationId": "channelLogs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "x-go-name": "Json",
+                        "name": "json",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Reverse",
+                        "name": "reverse",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "From",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "To",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Channel",
+                        "name": "channel",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "chatLog",
+                        "schema": {
+                            "$ref": "#/definitions/chatLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/channel/{channel}/random": {
+            "get": {
+                "description": "Get a random line from the entire channel log's history",
+                "produces": [
+                    "application/json",
+                    "text/plain"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "operationId": "randomChannelLog",
+                "responses": {
+                    "200": {
+                        "description": "chatLog",
+                        "schema": {
+                            "$ref": "#/definitions/chatLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/channel/{channel}/user/{username}": {
+            "get": {
+                "description": "Get user logs in channel of current month",
+                "produces": [
+                    "application/json",
+                    "text/plain"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "operationId": "channelUserLogs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "x-go-name": "Json",
+                        "name": "json",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Reverse",
+                        "name": "reverse",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "From",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "To",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Channel",
+                        "name": "channel",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Username",
+                        "name": "username",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "chatLog",
+                        "schema": {
+                            "$ref": "#/definitions/chatLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/channel/{channel}/user/{username}/random": {
+            "get": {
+                "description": "Get a random line from a user in a given channel",
+                "produces": [
+                    "application/json",
+                    "text/plain"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "operationId": "channelUserLogsRandom",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "x-go-name": "Json",
+                        "name": "json",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Reverse",
+                        "name": "reverse",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "From",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "To",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Channel",
+                        "name": "channel",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Username",
+                        "name": "username",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "chatLog",
+                        "schema": {
+                            "$ref": "#/definitions/chatLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/channel/{channel}/user/{username}/{year}/{month}": {
+            "get": {
+                "description": "Get user logs in channel of given year month",
+                "produces": [
+                    "application/json",
+                    "text/plain"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "operationId": "channelUserLogsYearMonth",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "x-go-name": "Json",
+                        "name": "json",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Reverse",
+                        "name": "reverse",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "From",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "To",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Channel",
+                        "name": "channel",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Username",
+                        "name": "username",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Year",
+                        "name": "year",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Month",
+                        "name": "month",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "chatLog",
+                        "schema": {
+                            "$ref": "#/definitions/chatLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/channel/{channel}/userid/{userid}": {
+            "get": {
+                "description": "Get user logs in channel of current month",
+                "produces": [
+                    "application/json",
+                    "text/plain"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "operationId": "channelUserIdLogs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "x-go-name": "Json",
+                        "name": "json",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Reverse",
+                        "name": "reverse",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "From",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "To",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Channel",
+                        "name": "channel",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "UserId",
+                        "name": "userid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "chatLog",
+                        "schema": {
+                            "$ref": "#/definitions/chatLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/channel/{channel}/userid/{userid}/random": {
+            "get": {
+                "description": "Get a random line from a user in a given channel",
+                "produces": [
+                    "application/json",
+                    "text/plain"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "operationId": "channelUserIdLogsRandom",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "x-go-name": "Json",
+                        "name": "json",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Reverse",
+                        "name": "reverse",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "From",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "To",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Channel",
+                        "name": "channel",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "UserId",
+                        "name": "userid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "chatLog",
+                        "schema": {
+                            "$ref": "#/definitions/chatLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/channel/{channel}/userid/{userid}/{year}/{month}": {
+            "get": {
+                "description": "Get user logs in channel of given year month",
+                "produces": [
+                    "application/json",
+                    "text/plain"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "operationId": "channelUserIdLogsYearMonth",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "x-go-name": "Json",
+                        "name": "json",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Reverse",
+                        "name": "reverse",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "From",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "To",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Channel",
+                        "name": "channel",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Userid",
+                        "name": "userid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Year",
+                        "name": "year",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Month",
+                        "name": "month",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "chatLog",
+                        "schema": {
+                            "$ref": "#/definitions/chatLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/channel/{channel}/{year}/{month}/{day}": {
+            "get": {
+                "description": "Get entire channel logs of given day",
+                "produces": [
+                    "application/json",
+                    "text/plain"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "operationId": "channelLogsYearMonthDay",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "x-go-name": "Json",
+                        "name": "json",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Reverse",
+                        "name": "reverse",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "From",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "To",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Channel",
+                        "name": "channel",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Year",
+                        "name": "year",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Month",
+                        "name": "month",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Day",
+                        "name": "day",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "chatLog",
+                        "schema": {
+                            "$ref": "#/definitions/chatLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/channelid/{channelid}/random": {
+            "get": {
+                "description": "Get a random line from the entire channel log's history",
+                "produces": [
+                    "application/json",
+                    "text/plain"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "operationId": "randomChannelLog",
+                "responses": {
+                    "200": {
+                        "description": "chatLog",
+                        "schema": {
+                            "$ref": "#/definitions/chatLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/channelid/{channelid}/user/{username}": {
+            "get": {
+                "description": "Get user logs in channel of current month",
+                "produces": [
+                    "application/json",
+                    "text/plain"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "operationId": "channelIdUserLogs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "x-go-name": "Json",
+                        "name": "json",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Reverse",
+                        "name": "reverse",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "From",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "To",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "ChannelId",
+                        "name": "channelid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Username",
+                        "name": "username",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "chatLog",
+                        "schema": {
+                            "$ref": "#/definitions/chatLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/channelid/{channelid}/user/{username}/{year}/{month}": {
+            "get": {
+                "description": "Get user logs in channel of given year month",
+                "produces": [
+                    "application/json",
+                    "text/plain"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "operationId": "channelIdUserLogsYearMonth",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "x-go-name": "Json",
+                        "name": "json",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Reverse",
+                        "name": "reverse",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "From",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "To",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "ChannelId",
+                        "name": "channelid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Username",
+                        "name": "username",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Year",
+                        "name": "year",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Month",
+                        "name": "month",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "chatLog",
+                        "schema": {
+                            "$ref": "#/definitions/chatLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/channelid/{channelid}/user/{user}/random": {
+            "get": {
+                "description": "Get a random line from a user in a given channel",
+                "produces": [
+                    "application/json",
+                    "text/plain"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "operationId": "channelIdUserLogsRandom",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "x-go-name": "Json",
+                        "name": "json",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Reverse",
+                        "name": "reverse",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "From",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "To",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "ChannelId",
+                        "name": "channelid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Username",
+                        "name": "username",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "chatLog",
+                        "schema": {
+                            "$ref": "#/definitions/chatLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/channelid/{channelid}/userid/{userid}": {
+            "get": {
+                "description": "Get user logs in channel of current month",
+                "produces": [
+                    "application/json",
+                    "text/plain"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "operationId": "channelIdUserIdLogs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "x-go-name": "Json",
+                        "name": "json",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Reverse",
+                        "name": "reverse",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "From",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "To",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "ChannelId",
+                        "name": "channelid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "UserId",
+                        "name": "userid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "chatLog",
+                        "schema": {
+                            "$ref": "#/definitions/chatLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/channelid/{channelid}/userid/{userid}/random": {
+            "get": {
+                "description": "Get a random line from a user in a given channel",
+                "produces": [
+                    "application/json",
+                    "text/plain"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "operationId": "channelIdUserIdLogsRandom",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "x-go-name": "Json",
+                        "name": "json",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Reverse",
+                        "name": "reverse",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "From",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "To",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "ChannelId",
+                        "name": "channelid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "UserId",
+                        "name": "userid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "chatLog",
+                        "schema": {
+                            "$ref": "#/definitions/chatLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/channelid/{channelid}/userid/{userid}/{year}/{month}": {
+            "get": {
+                "description": "Get user logs in channel of given year month",
+                "produces": [
+                    "application/json",
+                    "text/plain"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "operationId": "channelIdUserIdLogsYearMonth",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "x-go-name": "Json",
+                        "name": "json",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Reverse",
+                        "name": "reverse",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "From",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int32",
+                        "x-go-name": "To",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "ChannelId",
+                        "name": "channelid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "UserId",
+                        "name": "userid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Year",
+                        "name": "year",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Month",
+                        "name": "month",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "chatLog",
+                        "schema": {
+                            "$ref": "#/definitions/chatLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/channels": {
+            "get": {
+                "description": "List currently logged channels",
+                "produces": [
+                    "application/json",
+                    "text/plain"
+                ],
+                "schemes": [
+                    "https"
+                ],
+                "tags": [
+                    "justlog"
+                ],
+                "operationId": "channels",
+                "responses": {
+                    "200": {
+                        "description": "AllChannelsJSON",
+                        "schema": {
+                            "$ref": "#/definitions/AllChannelsJSON"
+                        }
+                    }
+                }
+            }
+        },
+        "/instances": {
+            "get": {
+                "description": "List currently logged channels sorted by the different forks",
+                "produces": [
+                    "application/json",
+                    "text/plain"
+                ],
+                "schemes": [
+                    "https"
+                ],
+                "tags": [
+                    "justlog"
+                ],
+                "operationId": "instances",
+                "responses": {
+                    "200": {
+                        "description": "AllInstancesJSON",
+                        "schema": {
+                            "$ref": "#/definitions/AllInstancesJSON"
+                        }
+                    }
+                }
+            }
+        },
+        "/list": {
+            "get": {
+                "produces": [
+                    "application/json",
+                    "text/plain"
+                ],
+                "schemes": [
+                    "https"
+                ],
+                "tags": [
+                    "logs"
+                ],
+                "summary": "Lists available logs of a user or channel, channel response also includes the day. OpenAPI 2 does not support multiple responses with the same http code right now.",
+                "operationId": "list",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "x-go-name": "Channel",
+                        "name": "channel",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Username",
+                        "name": "username",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "ChannelId",
+                        "name": "channelid",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "x-go-name": "Userid",
+                        "name": "userid",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "logList",
+                        "schema": {
+                            "$ref": "#/definitions/logList"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "AllChannelsJSON": {
+            "type": "object",
+            "properties": {
+                "channels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/channel"
+                    },
+                    "x-go-name": "Channels"
+                }
+            },
+            "x-go-package": "github.com/gempir/justlog/api"
+        },
+        "AllInstancesJSON": {
+            "type": "object",
+            "properties": {
+                "instances": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/channel"
+                    },
+                    "x-go-name": "Channels"
+                }
+            },
+            "x-go-package": "github.com/gempir/justlog/api"
+        },
+        "ChannelLogFile": {
+            "type": "object",
+            "properties": {
+                "day": {
+                    "type": "string",
+                    "x-go-name": "Day"
+                },
+                "month": {
+                    "type": "string",
+                    "x-go-name": "Month"
+                },
+                "year": {
+                    "type": "string",
+                    "x-go-name": "Year"
+                }
+            },
+            "x-go-package": "github.com/gempir/justlog/filelog"
+        },
+        "MessageType": {
+            "description": "MessageType different message types possible to receive via IRC",
+            "type": "integer",
+            "format": "int64",
+            "x-go-package": "github.com/gempir/go-twitch-irc/v3"
+        },
+        "UserLogFile": {
+            "type": "object",
+            "properties": {
+                "month": {
+                    "type": "string",
+                    "x-go-name": "Month"
+                },
+                "year": {
+                    "type": "string",
+                    "x-go-name": "Year"
+                }
+            },
+            "x-go-package": "github.com/gempir/justlog/filelog"
+        },
+        "channel": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "x-go-name": "Name"
+                },
+                "userID": {
+                    "type": "string",
+                    "x-go-name": "UserID"
+                }
+            },
+            "x-go-package": "github.com/gempir/justlog/api"
+        },
+        "channelConfigsJoinRequest": {
+            "type": "object",
+            "properties": {
+                "channels": {
+                    "description": "list of userIds",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "x-go-name": "Channels"
+                }
+            },
+            "x-go-package": "github.com/gempir/justlog/api"
+        },
+        "channelLogList": {
+            "type": "object",
+            "properties": {
+                "availableLogs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ChannelLogFile"
+                    },
+                    "x-go-name": "AvailableLogs"
+                }
+            },
+            "x-go-package": "github.com/gempir/justlog/api"
+        },
+        "channelsDeleteRequest": {
+            "type": "object",
+            "properties": {
+                "channels": {
+                    "description": "list of userIds",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "x-go-name": "Channels"
+                }
+            },
+            "x-go-package": "github.com/gempir/justlog/api"
+        },
+        "chatLog": {
+            "type": "object",
+            "properties": {
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/chatMessage"
+                    },
+                    "x-go-name": "Messages"
+                }
+            },
+            "x-go-package": "github.com/gempir/justlog/api"
+        },
+        "chatMessage": {
+            "type": "object",
+            "properties": {
+                "channel": {
+                    "type": "string",
+                    "x-go-name": "Channel"
+                },
+                "displayName": {
+                    "type": "string",
+                    "x-go-name": "DisplayName"
+                },
+                "id": {
+                    "type": "string",
+                    "x-go-name": "ID"
+                },
+                "raw": {
+                    "type": "string",
+                    "x-go-name": "Raw"
+                },
+                "tags": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "x-go-name": "Tags"
+                },
+                "text": {
+                    "type": "string",
+                    "x-go-name": "Text"
+                },
+                "timestamp": {
+                    "type": "string",
+                    "x-go-name": "Timestamp"
+                },
+                "type": {
+                    "$ref": "#/definitions/MessageType"
+                },
+                "username": {
+                    "type": "string",
+                    "x-go-name": "Username"
+                }
+            },
+            "x-go-package": "github.com/gempir/justlog/api"
+        },
+        "logList": {
+            "type": "object",
+            "properties": {
+                "availableLogs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/UserLogFile"
+                    },
+                    "x-go-name": "AvailableLogs"
+                }
+            },
+            "x-go-package": "github.com/gempir/justlog/api"
+        }
+    },
+    "securityDefinitions": {
+        "api_key": {
+            "type": "apiKey",
+            "name": "X-Api-Key",
+            "in": "header"
+        }
+    }
+}

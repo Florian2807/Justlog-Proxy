@@ -1,5 +1,5 @@
-import { Button, TextField } from "@material-ui/core";
-import { Autocomplete } from '@material-ui/lab';
+import { Button, TextField } from "@mui/material";
+import { Autocomplete } from '@mui/material';
 import React, { FormEvent, useContext } from "react";
 import { useQueryClient } from "react-query";
 import styled from "styled-components";
@@ -65,6 +65,7 @@ export function Filters() {
             <TextField error={state.error} name="username" label="username or id:123" variant="filled" autoComplete="off" defaultValue={state.currentUsername} autoFocus={state.currentChannel !== null && state.currentUsername === null} />
             <Button variant="contained" color="primary" size="large" type="submit">load</Button>
             <Settings />
+            <Docs />
         </FiltersContainer>
     </FiltersWrapper>
 }

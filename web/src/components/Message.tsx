@@ -21,8 +21,7 @@ const MessageContainer = styled.div`
 
 const Emote = styled.img`
 	max-height: 18px;
-	margin: 0 2px;
-	margin-bottom: -2px;
+	margin: 0 2px -2px;
 	width: auto;
 `;
 
