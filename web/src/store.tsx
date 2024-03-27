@@ -40,7 +40,7 @@ const url = new URL(window.location.href);
 const defaultContext = {
     state: {
         queryClient: new QueryClient(),
-        apiBaseUrl: "http://localhost:1111",
+        apiBaseUrl: "https://logs.florian2807.me",
         settings: {
             showEmotes: {
                 displayName: "Show Emotes",
