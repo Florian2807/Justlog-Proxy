@@ -1,8 +1,8 @@
-# Justlog Redirector
+# Justlog Proxy
 Small Node.js utility that finds the right [justlog](https://github.com/gempir/justlog) instance for a given channel and redirects to it.
 Tries to maintain API parity, so you should be able to just give it any link that would work with a normal justlog instance.
 
-Live instance: https://justlog.florian2807.me
+Live instance: https://logs.florian2807.me
 
 ## Installation
 
